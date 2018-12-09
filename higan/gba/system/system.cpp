@@ -6,6 +6,7 @@ System system;
 Scheduler scheduler;
 #include "bios.cpp"
 #include "serialization.cpp"
+#include "bios_data.cpp"
 
 auto System::init() -> void {
 }
@@ -32,17 +33,7 @@ auto System::power() -> void {
 }
 
 auto System::load(Emulator::Interface* interface) -> bool {
-  if(auto fp = platform->open(ID::System, "manifest.bml", File::Read, File::Required)) {
-    information.manifest = fp->reads();
-  } else return false;
-
-  auto document = BML::unserialize(information.manifest);
-
-  if(auto name = document["system/cpu/rom/name"].text()) {
-    if(auto fp = platform->open(ID::System, name, File::Read, File::Required)) {
-      fp->read(bios.data, bios.size);
-    }
-  }
+  memcpy(bios.data, bios_img, bios.size);
 
   if(!cartridge.load()) return false;
 

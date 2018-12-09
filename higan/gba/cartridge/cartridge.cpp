@@ -8,6 +8,7 @@ Cartridge cartridge;
 #include "eeprom.cpp"
 #include "flash.cpp"
 #include "serialization.cpp"
+#include "game_gba.c"
 
 Cartridge::Cartridge() {
   mrom.data = new uint8[mrom.size = 32 * 1024 * 1024];
@@ -41,12 +42,8 @@ auto Cartridge::load() -> bool {
   hasEEPROM = false;
   hasFLASH  = false;
 
-  if(auto memory = Emulator::Game::Memory{document["game/board/memory(type=ROM,content=Program)"]}) {
-    mrom.size = min(32 * 1024 * 1024, (uint)memory.size);
-    if(auto fp = platform->open(pathID(), memory.name(), File::Read, File::Required)) {
-      fp->read(mrom.data, mrom.size);
-    }
-  }
+  mrom.size = min(32 * 1024 * 1024, game_gba_len);
+  memcpy(mrom.data, game_gba, mrom.size);
 
   if(auto memory = Emulator::Game::Memory{document["game/board/memory(type=RAM,content=Save)"]}) {
     hasSRAM = true;

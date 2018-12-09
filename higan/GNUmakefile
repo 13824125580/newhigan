@@ -1,8 +1,8 @@
-target := bsnes
+target := higan
 binary := application
-build := performance
-openmp := true
-flags += -I. -I..
+build := debug
+openmp := false
+flags += -I. -I.. -g -O0
 
 nall.path := ../nall
 include $(nall.path)/GNUmakefile
